@@ -1,3 +1,5 @@
+import pymysql
+pymysql.install_as_mysqldb()
 from flask import Flask, render_template, request, redirect, url_for, session, jsonify, send_file
 from flask_mysqldb import MySQL
 from flask_mail import Mail, Message
@@ -20,6 +22,7 @@ app.config['MYSQL_PASSWORD'] = os.environ.get('MYSQL_PASSWORD')
 app.config['MYSQL_DB'] = 'defaultdb'
 app.config['MYSQL_PORT'] = 1118
 app.config['MYSQL_CURSORCLASS'] = 'DictCursor'
+app.config['MYSQL_SSL'] = {'ssl': {'reject_unauthorized': 'false'}}
 mysql = MySQL(app)
 
 # Flask-Mail Configurations

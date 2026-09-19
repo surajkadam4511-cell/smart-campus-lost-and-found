@@ -15,15 +15,18 @@ app = Flask(__name__)
 app.secret_key = 'your_secret_key_here'
 
 # MySQL Configurations
-# --- Aiven Cloud MySQL Configurations ---
-app.config['MYSQL_HOST'] = 'mysql-2e3ec238-adminoffice1028-c3d9.c.aivencloud.com'
-app.config['MYSQL_USER'] = 'avnadmin'
-app.config['MYSQL_PASSWORD'] = os.environ.get('MYSQL_PASSWORD')
-app.config['MYSQL_DB'] = 'defaultdb'
-app.config['MYSQL_PORT'] = 1118
-app.config['MYSQL_CURSORCLASS'] = 'DictCursor'
-app.config['MYSQL_SSL'] = {'ssl': {'reject_unauthorized': 'false'}}
-mysql = MySQL(app)
+# --- Aiven Cloud MySQL Direct Connection ---
+def get_db_connection():
+    return pymysql.connect(
+        host=os.getenv('MYSQL_HOST', 'mysql-2e3ec238-adminoffice1028-c3d9.c.aivencloud.com'),
+        user=os.getenv('MYSQL_USER', 'avnadmin'),
+        password=os.getenv('MYSQL_PASSWORD'),
+        database=os.getenv('MYSQL_DB', 'defaultdb'),
+        port=int(os.getenv('MYSQL_PORT', 1118)),
+        cursorclass=pymysql.cursors.DictCursor,
+        ssl={'reject_unauthorized': False}
+    )
+
 
 # Flask-Mail Configurations
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'

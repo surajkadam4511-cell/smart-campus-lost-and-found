@@ -21,16 +21,10 @@ app.secret_key = 'your_secret_key_here'
 # MySQL Configurations
 # --- Aiven Cloud MySQL Direct Connection ---
 def get_db_connection():
-    url = urlparse.urlparse(os.getenv('DATABASE_URL'))
     return psycopg2.connect(
-        database=url.path[1:],
-        user=url.username,
-        password=url.password,
-        host=url.hostname,
-        port=url.port,
+        os.getenv('DATABASE_URL'),
         cursor_factory=psycopg2.extras.DictCursor
     )
-
 
 # Flask-Mail Configurations
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'

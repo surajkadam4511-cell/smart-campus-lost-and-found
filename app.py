@@ -1,3 +1,6 @@
+import psycopg2
+import psycopg2.extras
+import urllib.parse as urlparse
 import pymysql
 pymysql.install_as_MySQLdb()
 import ssl
@@ -18,18 +21,14 @@ app.secret_key = 'your_secret_key_here'
 # MySQL Configurations
 # --- Aiven Cloud MySQL Direct Connection ---
 def get_db_connection():
-    ssl_context = ssl.create_default_context()
-    ssl_context.check_hostname = False
-    ssl_context.verify_mode = ssl.CERT_NONE
-    
-    return pymysql.connect(
-        host=os.getenv('MYSQL_HOST', 'mysql-2e3ec238-adminoffice1028-c3d9.c.aivencloud.com'),
-        user=os.getenv('MYSQL_USER', 'avnadmin'),
-        password=os.getenv('MYSQL_PASSWORD'),
-        database=os.getenv('MYSQL_DB', 'defaultdb'),
-        port=int(os.getenv('MYSQL_PORT', 1118)),
-        cursorclass=pymysql.cursors.DictCursor,
-        ssl={'reject_unauthorized': False}
+    url = urlparse.urlparse(os.getenv('DATABASE_URL'))
+    return psycopg2.connect(
+        database=url.path[1:],
+        user=url.username,
+        password=url.password,
+        host=url.hostname,
+        port=url.port,
+        cursor_factory=psycopg2.extras.DictCursor
     )
 
 

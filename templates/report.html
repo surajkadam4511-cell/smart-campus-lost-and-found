@@ -1,0 +1,52 @@
+<form action="/report" method="POST" enctype="multipart/form-data">
+    <div class="mb-3">
+        <label class="form-label">Item Title</label>
+        <input type="text" name="title" class="form-control" required>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Description (Publicly visible)</label>
+        <textarea name="description" class="form-control" rows="3" required></textarea>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Secret Item Details (Admin View Only)</label>
+        <input type="text" name="hidden_details" class="form-control" placeholder="e.g., Contains a gym card inside">
+        <div class="form-text text-muted">Hidden from public view; used exclusively by admin for verification.</div>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Category</label>
+        <select name="category" class="form-control" required>
+            <option value="Electronics">Electronics</option>
+            <option value="Accessories">Accessories</option>
+            <option value="Documents">Documents</option>
+            <option value="Others">Others</option>
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Location</label>
+        <input type="text" name="location" class="form-control" required>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Date</label>
+        <input type="date" name="date_reported" class="form-control" required>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Type</label>
+        <select name="type" class="form-control" required>
+            <option value="lost">Lost</option>
+            <option value="found">Found</option>
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Upload Image</label>
+        <input type="file" name="image" class="form-control">
+    </div>
+
+    <button type="submit" class="btn btn-success w-100">Submit Report</button>
+</form>

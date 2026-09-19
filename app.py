@@ -20,9 +20,6 @@ app.config['MYSQL_PASSWORD'] = os.environ.get('MYSQL_PASSWORD')
 app.config['MYSQL_DB'] = 'defaultdb'
 app.config['MYSQL_PORT'] = 1118
 app.config['MYSQL_CURSORCLASS'] = 'DictCursor'
-```[cite: 7, 8, 9]
-
-
 mysql = MySQL(app)
 
 # Flask-Mail Configurations

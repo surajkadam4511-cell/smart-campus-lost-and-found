@@ -126,7 +126,8 @@ def admin_login():
         if not re.match(EMAIL_REGEX, email):
             return render_template('login.html', is_admin_portal=True, error="Please enter a valid email address.")
         
-        cur = mysql.connection.cursor()
+        conn = get_db_connection()
+        cur = conn.cursor()
         cur.execute("SELECT * FROM users WHERE email = %s AND password = %s", (email, password))
         user = cur.fetchone()
         cur.close()

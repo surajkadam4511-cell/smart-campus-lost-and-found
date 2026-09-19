@@ -1,5 +1,6 @@
 import pymysql
 pymysql.install_as_MySQLdb()
+import ssl
 from flask import Flask, render_template, request, redirect, url_for, session, jsonify, send_file
 from flask_mysqldb import MySQL
 from flask_mail import Mail, Message
@@ -17,6 +18,10 @@ app.secret_key = 'your_secret_key_here'
 # MySQL Configurations
 # --- Aiven Cloud MySQL Direct Connection ---
 def get_db_connection():
+    ssl_context = ssl.create_default_context()
+    ssl_context.check_hostname = False
+    ssl_context.verify_mode = ssl.CERT_NONE
+    
     return pymysql.connect(
         host=os.getenv('MYSQL_HOST', 'mysql-2e3ec238-adminoffice1028-c3d9.c.aivencloud.com'),
         user=os.getenv('MYSQL_USER', 'avnadmin'),

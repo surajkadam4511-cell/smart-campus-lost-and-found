@@ -3,323 +3,329 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Smart Campus Lost & Found</title>
-    <!-- Bootstrap 5 CSS -->
+    <title>Smart Campus Lost & Found - Dashboard</title>
+    <!-- Bootstrap 5 CSS CDN -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Bootstrap Icons -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f4f7f6;
+        }
+        .navbar {
+            background: linear-gradient(135deg, #1f2937, #111827) !important;
+            backdrop-filter: blur(10px);
+        }
+        .card {
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.08)!important;
+        }
+        .dropdown-menu {
+            border-radius: 12px;
+            animation: fadeIn 0.2s ease;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
 </head>
-<body class="bg-light">
+<body>
 
-    <!-- Navigation Bar -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark px-4 py-3 shadow-sm">
-        <div class="container-fluid">
-            <a class="navbar-brand d-flex align-items-center gap-2" href="{{ url_for('dashboard') }}">
-                <div class="bg-primary text-white p-2 rounded fw-bold" style="font-size: 14px; line-height: 1;">LF</div>
-                <span class="fw-bold">Smart Campus</span>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark shadow-sm sticky-top py-3">
+        <div class="container">
+            <a class="navbar-brand fw-bold fs-5" href="{{ url_for('dashboard') }}">
+                <i class="fa-solid fa-graduation-cap text-primary me-2"></i>Smart Campus <span class="text-light fw-light">Lost & Found</span>
             </a>
-            <div class="d-flex align-items-center gap-2">
-                <!-- Report Lost Item Button -->
-                <button class="btn btn-danger btn-sm text-white" data-bs-toggle="modal" data-bs-target="#reportLostModal">
-                    <i class="bi bi-exclamation-circle me-1"></i> Report Lost Item
-                </button>
-                <!-- Report Found Item Button -->
-                <button class="btn btn-success btn-sm text-white" data-bs-toggle="modal" data-bs-target="#reportFoundModal">
-                    <i class="bi bi-check-circle me-1"></i> Report Found Item
-                </button>
-                <!-- My Claim Status Button -->
-                <button class="btn btn-info btn-sm text-white" data-bs-toggle="modal" data-bs-target="#myClaimsModal">
-                    <i class="bi bi-shield-check me-1"></i> My Claim Status
-                </button>
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+                <ul class="navbar-nav align-items-center gap-2">
+                    
+                    <!-- Dynamic Header Profile Dropdown -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle text-light d-flex align-items-center bg-dark bg-opacity-50 px-3 py-1.5 rounded-pill border border-secondary" href="#" id="profileDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center me-2 fw-bold shadow-sm" style="width: 30px; height: 30px; font-size: 13px;">
+                                {{ user[0] | upper }}
+                            </div>
+                            <span class="small fw-medium">{{ user }}</span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end shadow border-0 p-3 mt-2" aria-labelledby="profileDropdown" style="min-width: 260px;">
+                            <li class="text-center mb-3">
+                                <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-2 shadow" style="width: 60px; height: 60px; font-size: 24px;">
+                                    {{ user[0] | upper }}
+                                </div>
+                                <h6 class="fw-bold mb-0 text-dark text-truncate px-2">{{ user }}</h6>
+                                <span class="badge bg-light text-secondary border mt-1">Verified Student</span>
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li class="mb-2 px-2">
+                                <span class="d-block text-muted" style="font-size: 0.75rem;"><i class="fa-solid fa-envelope me-1"></i>EMAIL ADDRESS</span>
+                                <span class="text-dark small fw-semibold text-break">{{ user }}</span>
+                            </li>
+                            <li class="mb-3 px-2">
+                                <span class="d-block text-muted" style="font-size: 0.75rem;"><i class="fa-solid fa-phone me-1"></i>PHONE NUMBER</span>
+                                <span class="text-dark small fw-semibold">{{ phone | default('Not Registered', true) }}</span>
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <a class="dropdown-item text-danger rounded small text-center fw-bold py-2 mt-1 bg-danger bg-opacity-10 hover-bg-danger" href="{{ url_for('logout') }}">
+                                    <i class="fa-solid fa-right-from-bracket me-1"></i>Sign Out
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
 
-                <!-- User Profile & Picture Display -->
-                <div class="d-flex align-items-center ms-3 ps-3 border-start border-secondary gap-2" style="cursor: pointer;" data-bs-toggle="modal" data-bs-target="#profileModal">
-                    {% if user_profile and user_profile.profile_pic %}
-                        <img src="{{ url_for('static', filename=user_profile.profile_pic) }}" class="rounded-circle" width="32" height="32" style="object-fit: cover;" alt="Profile">
-                    {% else %}
-                        <div class="bg-secondary text-white rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width: 32px; height: 32px; font-size: 14px;">
-                            {{ user[0] | upper }}
-                        </div>
-                    {% endif %}
-                    <span class="text-white small d-none d-md-inline">{{ user }}</span>
-                </div>
-
-                <a href="{{ url_for('logout') }}" class="btn btn-outline-light btn-sm ms-2" title="Logout">
-                    <i class="bi bi-box-arrow-right"></i>
-                </a>
+                    <!-- Claims Modal Trigger Button -->
+                    <li class="nav-item">
+                        <button class="btn btn-outline-light btn-sm px-3 rounded-pill" data-bs-toggle="modal" data-bs-target="#claimsModal">
+                            <i class="fa-solid fa-list-check me-1 text-info"></i>My Claims
+                        </button>
+                    </li>
+                    
+                    <!-- Report Item Button -->
+                    <li class="nav-item">
+                        <button class="btn btn-primary btn-sm px-3 rounded-pill shadow-sm" data-bs-toggle="modal" data-bs-target="#reportModal">
+                            <i class="fa-solid fa-plus me-1"></i>Report Item
+                        </button>
+                    </li>
+                </ul>
             </div>
         </div>
     </nav>
 
     <!-- Main Container -->
-    <div class="container my-4">
-
-        <!-- Search Form -->
-        <div class="row justify-content-center mb-5">
-            <div class="col-md-8">
-                <form action="{{ url_for('dashboard') }}" method="GET" class="input-group shadow-sm">
-                    <input type="text" name="search" class="form-control form-control-lg border-0" placeholder="Search items by title, category, or location..." value="{{ request.args.get('search', '') }}">
-                    <button class="btn btn-dark px-4" type="submit">
-                        <i class="bi bi-search"></i> Search
-                    </button>
+    <div class="container my-5">
+        
+        <!-- Search & Filter Bar -->
+        <div class="row mb-5">
+            <div class="col-md-8 mx-auto">
+                <form action="{{ url_for('dashboard') }}" method="GET" class="input-group shadow-sm rounded-pill overflow-hidden bg-white p-1 border">
+                    <input type="text" name="search" class="form-control border-0 ps-4 shadow-none" placeholder="Search by title, category, or location..." value="{{ request.args.get('search', '') }}">
+                    <button class="btn btn-dark rounded-pill px-4" type="submit"><i class="fa-solid fa-search me-1"></i>Search</button>
+                    {% if request.args.get('search') %}
+                        <a href="{{ url_for('dashboard') }}" class="btn btn-link text-muted text-decoration-none px-3">Reset</a>
+                    {% endif %}
                 </form>
             </div>
         </div>
 
-        <!-- Active Campus Feed Header -->
+        <!-- Active Feed Section Heading -->
         <div class="d-flex justify-content-between align-items-center mb-4">
-            <h3 class="fw-bold text-dark m-0">Active Campus Feed</h3>
+            <h4 class="text-dark fw-bold m-0"><i class="fa-solid fa-layer-group text-primary me-2"></i>Active Campus Feed</h4>
+            <span class="badge bg-white text-dark border px-3 py-2 shadow-sm rounded-pill">Total Items: {{ items | length if items else 0 }}</span>
         </div>
-
-        <!-- Items Grid -->
+        
+        <!-- Dynamic Items Grid -->
         {% if items %}
-            <div class="row">
+            <div class="row row-cols-1 row-cols-md-3 g-4">
                 {% for item in items %}
-                    <div class="col-md-4 mb-4">
-                        <div class="card h-100 shadow-sm border-0">
-                            {% if item.image_url %}
-                                <img src="{{ url_for('static', filename=item.image_url) }}" class="card-img-top" style="height: 180px; object-fit: cover;" alt="Item Image">
+                <div class="col">
+                    <div class="card h-100 border-0 shadow-sm">
+                        {% if item.image_url %}
+                            <img src="{{ url_for('static', filename=item.image_url) }}" class="card-img-top" alt="Item Image" style="height: 210px; object-fit: cover;">
+                        {% else %}
+                            <div class="bg-light text-muted d-flex align-items-center justify-content-center" style="height: 210px;">
+                                <i class="fa-solid fa-image fa-2x opacity-50"></i>
+                            </div>
+                        {% endif %}
+                        <div class="card-body d-flex flex-column">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="badge bg-{{ 'danger' if item.type == 'lost' else 'success' }} text-uppercase px-2 py-1">{{ item.type }}</span>
+                                <small class="text-muted"><i class="fa-regular fa-calendar me-1"></i>{{ item.date_reported }}</small>
+                            </div>
+                            <h5 class="card-title fw-bold text-dark mb-2">{{ item.title }}</h5>
+                            <p class="card-text text-muted small mb-1"><i class="fa-solid fa-tag me-2 text-secondary"></i><strong>Category:</strong> {{ item.category }}</p>
+                            <p class="card-text text-muted small mb-3"><i class="fa-solid fa-location-dot me-2 text-secondary"></i><strong>Location:</strong> {{ item.location }}</p>
+                            <p class="card-text text-secondary small flex-grow-1">{{ item.description }}</p>
+                        </div>
+                        <div class="card-footer bg-white border-0 pt-0 pb-3 px-3">
+                            {% if item.reporter_email != user %}
+                                <button class="btn btn-outline-primary w-100 btn-sm rounded-pill fw-semibold py-2" data-bs-toggle="modal" data-bs-target="#claimModal" data-item-id="{{ item.id }}" data-item-title="{{ item.title }}">
+                                    <i class="fa-solid fa-hand-holding-heart me-1"></i>Claim This Item
+                                </button>
                             {% else %}
-                                <div class="bg-secondary text-white d-flex align-items-center justify-content-center" style="height: 180px;">No Image</div>
-                            {% endif %}
-                            <div class="card-body d-flex flex-column">
-                                <div class="d-flex justify-content-between align-items-center mb-2">
-                                    <span class="badge {% if item.type == 'lost' %}bg-danger{% else %}bg-success{% endif %} text-uppercase">
-                                        {{ item.type }}
-                                    </span>
-                                    <small class="text-muted">{{ item.date_reported }}</small>
+                                <div class="bg-light text-center py-2 rounded-pill text-muted small fst-italic">
+                                    <i class="fa-solid fa-circle-user me-1"></i>Your reported listing
                                 </div>
-                                <h5 class="card-title fw-bold">{{ item.title }}</h5>
-                                <h6 class="text-primary small mb-2"><i class="bi bi-tag"></i> {{ item.category }}</h6>
-                                <p class="card-text text-muted small mb-1"><i class="bi bi-geo-alt"></i> {{ item.location }}</p>
-                                <p class="card-text text-secondary small flex-grow-1">{{ item.description }}</p>
-                                <hr class="my-2">
-                                
-                                {% if item.reporter_email != user %}
-                                    <button class="btn btn-outline-primary btn-sm w-100 mt-auto" data-bs-toggle="modal" data-bs-target="#claimModal{{ item.id }}">
-                                        <i class="bi bi-hand-index-thumb"></i> Claim Item
-                                    </button>
-                                {% else %}
-                                    <span class="badge bg-secondary text-center py-2 w-100 mt-auto">Your Reported Item</span>
-                                {% endif %}
-                            </div>
+                            {% endif %}
                         </div>
                     </div>
-
-                    <!-- Claim Modal for Item -->
-                    {% if item.reporter_email != user %}
-                    <div class="modal fade" id="claimModal{{ item.id }}" tabindex="-1" aria-hidden="true">
-                        <div class="modal-dialog">
-                            <div class="modal-content">
-                                <form action="{{ url_for('claim_item', item_id=item.id) }}" method="POST">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title fw-bold">Claim Item: {{ item.title }}</h5>
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                    </div>
-                                    <div class="modal-body">
-                                        <input type="hidden" name="item_id" value="{{ item.id }}">
-                                        <div class="mb-3">
-                                            <label class="form-label">Proof of Ownership / Hidden Details</label>
-                                            <textarea class="form-control" name="proof_details" rows="3" placeholder="Provide serial numbers, secret marks, or descriptions only the owner would know..." required></textarea>
-                                        </div>
-                                    </div>
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
-                                        <button type="submit" class="btn btn-primary btn-sm">Submit Claim</button>
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                    {% endif %}
+                </div>
                 {% endfor %}
             </div>
         {% else %}
-            <div class="text-center py-5 bg-white rounded shadow-sm border">
-                <i class="bi bi-folder2-open display-4 text-muted"></i>
-                <p class="text-muted mt-3">No active items found matching your criteria.</p>
+            <div class="card border-0 shadow-sm text-center py-5 bg-white">
+                <div class="card-body">
+                    <i class="fa-solid fa-folder-open fa-3x text-muted mb-3 opacity-50"></i>
+                    <h5 class="text-dark fw-bold">No active items found</h5>
+                    <p class="text-muted small mb-3">Try adjusting your search query or report a new lost/found item.</p>
+                </div>
             </div>
         {% endif %}
 
     </div>
 
-    <!-- My Claim Status Modal -->
-    <div class="modal fade" id="myClaimsModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header bg-dark text-white">
-                    <h5 class="modal-title fw-bold"><i class="bi bi-shield-check me-2"></i>My Claim Status</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+    <!-- ================= MY CLAIMS MODAL ================= -->
+    <div class="modal fade" id="claimsModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content border-0 shadow rounded-4 overflow-hidden">
+                <div class="modal-header bg-dark text-white px-4 py-3">
+                    <h5 class="modal-title fw-bold"><i class="fa-solid fa-list-check me-2 text-info"></i>My Claim Requests Status</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
-                <div class="modal-body">
+                <div class="modal-body p-4">
                     {% if my_claims %}
-                        <div class="list-group">
-                            {% for claim in my_claims %}
-                                <div class="list-group-item list-group-item-action mb-2 rounded border shadow-sm">
-                                    <div class="d-flex w-100 justify-content-between align-items-center">
-                                        <h5 class="mb-1 fw-bold text-dark">{{ claim.item_title }}</h5>
-                                        <div>
-                                            {% if claim.status == 'pending' %}
-                                                <span class="badge bg-warning text-dark px-3 py-2">Pending Review</span>
-                                            {% elif claim.status == 'approved' %}
-                                                <span class="badge bg-success px-3 py-2">Approved</span>
-                                            {% else %}
-                                                <span class="badge bg-danger px-3 py-2">Rejected</span>
-                                            {% endif %}
-                                        </div>
-                                    </div>
-                                    <p class="mb-1 text-muted small mt-2"><strong>Proof Provided:</strong> {{ claim.proof_details }}</p>
-                                </div>
-                            {% endfor %}
+                        <div class="table-responsive">
+                            <table class="table align-middle mb-0">
+                                <thead class="table-light text-uppercase fs-7">
+                                    <tr>
+                                        <th class="py-3">Item Title</th>
+                                        <th class="py-3">Proof Details Provided</th>
+                                        <th class="py-3 text-center">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for claim in my_claims %}
+                                    <tr>
+                                        <td class="fw-bold text-dark py-3">{{ claim.item_title }}</td>
+                                        <td class="text-muted small py-3">{{ claim.proof_details }}</td>
+                                        <td class="text-center py-3">
+                                            <span class="badge rounded-pill px-3 py-2 bg-{{ 'warning text-dark' if claim.status == 'pending' else ('success' if claim.status == 'approved' else 'danger') }}">
+                                                {{ claim.status | capitalize }}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
                         </div>
                     {% else %}
-                        <div class="text-center py-4 text-muted">
-                            <i class="bi bi-info-circle display-6 mb-2"></i>
-                            <p class="mb-0">You haven't submitted any item claims yet.</p>
+                        <div class="text-center py-4">
+                            <i class="fa-solid fa-receipt fa-2x text-muted mb-2 opacity-50"></i>
+                            <p class="text-muted mb-0">You haven't filed any claim requests yet.</p>
                         </div>
                     {% endif %}
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Close</button>
+                <div class="modal-footer bg-light px-4 py-3">
+                    <button type="button" class="btn btn-secondary btn-sm px-4 rounded-pill" data-bs-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Profile Modal -->
-    <div class="modal fade" id="profileModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <form action="{{ url_for('update_profile') }}" method="POST" enctype="multipart/form-data">
-                    <div class="modal-header bg-dark text-white">
-                        <h5 class="modal-title fw-bold">User Profile</h5>
-                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body text-center">
-                        <div class="mb-3">
-                            {% if user_profile and user_profile.profile_pic %}
-                                <img src="{{ url_for('static', filename=user_profile.profile_pic) }}" class="rounded-circle img-thumbnail mb-2" width="100" height="100" style="object-fit: cover;" alt="Profile Picture">
-                            {% else %}
-                                <div class="bg-secondary text-white rounded-circle d-flex align-items-center justify-content-center fw-bold mx-auto mb-2" style="width: 100px; height: 100px; font-size: 36px;">
-                                    {{ user[0] | upper }}
-                                </div>
-                            {% endif %}
-                            <h5 class="fw-bold text-dark">{{ user }}</h5>
-                            <p class="text-muted small">Phone: {{ user_profile.phone if user_profile and user_profile.phone else 'Not Provided' }}</p>
-                        </div>
-                        <div class="mb-3 text-start">
-                            <label class="form-label">Update Profile Picture</label>
-                            <input type="file" class="form-control" name="profile_pic" required>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
-                        <button type="submit" class="btn btn-primary btn-sm">Save Changes</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
-    <!-- Report Lost Item Modal -->
-    <div class="modal fade" id="reportLostModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
+    <!-- ================= REPORT ITEM MODAL ================= -->
+    <div class="modal fade" id="reportModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow rounded-4 overflow-hidden">
                 <form action="{{ url_for('report_item') }}" method="POST" enctype="multipart/form-data">
-                    <div class="modal-header bg-danger text-white">
-                        <h5 class="modal-title fw-bold">Report Lost Item</h5>
-                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <div class="modal-header bg-dark text-white px-4 py-3">
+                        <h5 class="modal-title fw-bold"><i class="fa-solid fa-bullhorn me-2 text-warning"></i>Report Lost or Found Item</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                     </div>
-                    <div class="modal-body">
-                        <input type="hidden" name="type" value="lost">
+                    <div class="modal-body p-4">
                         <div class="mb-3">
-                            <label class="form-label">Item Title</label>
-                            <input type="text" class="form-control" name="title" required>
+                            <label class="form-label fw-semibold small">Item Type</label>
+                            <select name="type" class="form-select rounded-3 shadow-none" required>
+                                <option value="lost">Lost Item</option>
+                                <option value="found">Found Item</option>
+                            </select>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label">Category</label>
-                            <input type="text" class="form-control" name="category" required>
+                            <label class="form-label fw-semibold small">Title / Name of Item</label>
+                            <input type="text" name="title" class="form-control rounded-3 shadow-none" placeholder="e.g., Black HP Laptop Charger" required>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label">Location</label>
-                            <input type="text" class="form-control" name="location" required>
+                            <label class="form-label fw-semibold small">Category</label>
+                            <select name="category" class="form-select rounded-3 shadow-none" required>
+                                <option value="Electronics">Electronics</option>
+                                <option value="Documents/ID">Documents / ID Cards</option>
+                                <option value="Books/Notebooks">Books & Notebooks</option>
+                                <option value="Accessories">Accessories (Wallets, Keys, etc.)</option>
+                                <option value="Other">Other</option>
+                            </select>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label">Date</label>
-                            <input type="date" class="form-control" name="date_reported" required>
+                            <label class="form-label fw-semibold small">Location Lost/Found</label>
+                            <input type="text" name="location" class="form-control rounded-3 shadow-none" placeholder="e.g., 3rd Floor Computer Lab" required>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label">Description</label>
-                            <textarea class="form-control" name="description" rows="2" required></textarea>
+                            <label class="form-label fw-semibold small">Date</label>
+                            <input type="date" name="date_reported" class="form-control rounded-3 shadow-none" required>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label">Hidden Secret Details (For Claim Verification)</label>
-                            <textarea class="form-control" name="hidden_details" rows="2" required></textarea>
+                            <label class="form-label fw-semibold small">Description</label>
+                            <textarea name="description" class="form-control rounded-3 shadow-none" rows="2" placeholder="Public description..." required></textarea>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label">Image</label>
-                            <input type="file" class="form-control" name="image" required>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
-                        <button type="submit" class="btn btn-danger btn-sm">Submit Report</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
-    <!-- Report Found Item Modal -->
-    <div class="modal fade" id="reportFoundModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <form action="{{ url_for('report_item') }}" method="POST" enctype="multipart/form-data">
-                    <div class="modal-header bg-success text-white">
-                        <h5 class="modal-title fw-bold">Report Found Item</h5>
-                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <input type="hidden" name="type" value="found">
-                        <div class="mb-3">
-                            <label class="form-label">Item Title</label>
-                            <input type="text" class="form-control" name="title" required>
+                            <label class="form-label fw-semibold small">Hidden Identifying Details (For Verification)</label>
+                            <textarea name="hidden_details" class="form-control rounded-3 shadow-none" rows="2" placeholder="e.g., Sticker on back, specific lock screen wallpaper..." required></textarea>
+                            <div class="form-text text-muted" style="font-size: 0.75rem;">Only visible to admin to verify true ownership.</div>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label">Category</label>
-                            <input type="text" class="form-control" name="category" required>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Location</label>
-                            <input type="text" class="form-control" name="location" required>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Date</label>
-                            <input type="date" class="form-control" name="date_reported" required>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Description</label>
-                            <textarea class="form-control" name="description" rows="2" required></textarea>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Hidden Secret Details (For Claim Verification)</label>
-                            <textarea class="form-control" name="hidden_details" rows="2" required></textarea>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Image</label>
-                            <input type="file" class="form-control" name="image" required>
+                            <label class="form-label fw-semibold small">Upload Image</label>
+                            <input type="file" name="image" class="form-control rounded-3 shadow-none" accept="image/*" required>
                         </div>
                     </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
-                        <button type="submit" class="btn btn-success btn-sm">Submit Report</button>
+                    <div class="modal-footer bg-light px-4 py-3">
+                        <button type="button" class="btn btn-outline-secondary btn-sm px-4 rounded-pill" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-dark btn-sm px-4 rounded-pill">Submit Report</button>
                     </div>
                 </form>
             </div>
         </div>
     </div>
 
-    <!-- Bootstrap JS Bundle -->
+    <!-- ================= CLAIM ITEM MODAL ================= -->
+    <div class="modal fade" id="claimModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow rounded-4 overflow-hidden">
+                <form action="{{ url_for('claim_item') }}" method="POST">
+                    <div class="modal-header bg-primary text-white px-4 py-3">
+                        <h5 class="modal-title fw-bold"><i class="fa-solid fa-hand-holding-heart me-2"></i>Claim: <span id="modalItemTitle" class="fw-light"></span></h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body p-4">
+                        <input type="hidden" name="item_id" id="modalItemId">
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold small">Proof of Ownership / Identifying Details</label>
+                            <textarea name="proof_details" class="form-control rounded-3 shadow-none" rows="4" placeholder="Describe unique features or hidden details known only to the owner to verify your claim..." required></textarea>
+                            <div class="form-text text-muted mt-2" style="font-size: 0.75rem;">Provide accurate hidden markers so the administrator can securely approve your request.</div>
+                        </div>
+                    </div>
+                    <div class="modal-footer bg-light px-4 py-3">
+                        <button type="button" class="btn btn-outline-secondary btn-sm px-4 rounded-pill" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary btn-sm px-4 rounded-pill">Submit Claim Request</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap 5 JS Bundle CDN -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- JavaScript to populate dynamic Claim modal info -->
+    <script>
+        const claimModal = document.getElementById('claimModal');
+        claimModal.addEventListener('show.bs.modal', function (event) {
+            const button = event.relatedTarget;
+            const itemId = button.getAttribute('data-item-id');
+            const itemTitle = button.getAttribute('data-item-title');
+
+            document.getElementById('modalItemId').value = itemId;
+            document.getElementById('modalItemTitle').textContent = itemTitle;
+        });
+    </script>
 </body>
 </html>
